@@ -13,7 +13,7 @@ Result mcuExit()
     return svcCloseHandle(mcuHandle);
 }
 
-Result mcuReadRegister(u8 reg, u8* data, u32 size)
+Result mcuReadRegister(s8 reg, s8* data, s32 size)
 {
     u32* ipc = getThreadCommandBuffer();
     ipc[0] = 0x10082;
@@ -26,7 +26,7 @@ Result mcuReadRegister(u8 reg, u8* data, u32 size)
     return ipc[1];
 }
 
-Result mcuWriteRegister(u8 reg, u8* data, u32 size)
+Result mcuWriteRegister(s8 reg, s8* data, s32 size)
 {
     u32* ipc = getThreadCommandBuffer();
     ipc[0] = 0x20082;
