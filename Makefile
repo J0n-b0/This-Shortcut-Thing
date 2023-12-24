@@ -3,41 +3,46 @@
 #---------------------------------------------------------------------------------
 
 ifeq ($(strip $(DEVKITARM)),)
-$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
+$(error "Please set DEVKITARM in your environment. set/export DEVKITARM=<path to>devkitARM")
 endif
 
 TOPDIR ?= $(CURDIR)
 include $(DEVKITARM)/3ds_rules
 
 #---------------------------------------------------------------------------------
-# TARGET is the name of the output
-# BUILD is the directory where object files & intermediate files will be placed
-# SOURCES is a list of directories containing source code
-# DATA is a list of directories containing data files
-# INCLUDES is a list of directories containing header files
+# - TARGET is the name of the output
+# - BUILD is the directory where object files & intermediate files will be placed
+# - SOURCES is a list of directories containing source code
+# - DATA is a list of directories containing data files
+# - INCLUDES is a list of directories containing header files
 #
-# NO_SMDH if set to anything, no SMDH file is generated.
-# APP_TITLE is the name of the app stored in the SMDH file (Optional)
-# APP_DESCRIPTION is the description of the app stored in the SMDH file (Optional)
-# APP_AUTHOR is the author of the app stored in the SMDH file (Optional)
-# ICON is the filename of the icon (.png), relative to the project folder.
-#   If not set, it attempts to use one of the following (in this order):
-#     - <Project name>.png
-#     - icon.png
-#     - <libctru folder>/default_icon.png
+# - NO_SMDH if set to anything, no SMDH file is generated.
+# - APP_TITLE is the name of the app stored in the SMDH file (Optional)
+# - APP_DESCRIPTION is the description of the app stored in the SMDH file (Optional)
+# - APP_AUTHOR is the author of the app stored in the SMDH file (Optional)
+# - ICON is the filename of the icon (.png), relative to the project folder.
+#    If not set, it attempts to use one of the following (in this order):
+#      1- <Project name>.png
+#      2- icon.png
+#      3- <libctru folder>/default_icon.png
+# - ZIP if set to true, will package the files into a .7z file (Optional).
+# - KAZIP (Keep After Zip) if set to true, will keep files after zipping. 
+#   Applies only if ZIP is true (Optional).
 #---------------------------------------------------------------------------------
 BUILD		    :=	build
 SOURCES		    :=	source
 DATA		    :=	data
 INCLUDES	    :=	inc
 ROMFS			:=	romfs
-APP_TITLE       :=  GodMode9
+APP_TITLE       :=  open_agb_firm
 TARGET		    :=	$(APP_TITLE)
 APP_DESCRIPTION :=  Open source 3DS all access file browser
 APP_AUTHOR      :=  d0k3
-APP_PRODUCT_CODE:=  CTR-P-AGM9
+APP_PRODUCT_CODE:=  CTR-P-AAGB
 APP_UNIQUE_ID   :=  0xA9001
 ICON            :=  $(TOPDIR)/assets/icon.png
+ZIP             :=  true
+KAZIP           :=  
 
 APP_TITLE       :=  $(shell echo "$(APP_TITLE)" | cut -c1-128)
 APP_DESCRIPTION :=  $(shell echo "$(APP_DESCRIPTION)" | cut -c1-256)
@@ -54,7 +59,7 @@ CFLAGS	:=	-g -Wall -O2 -mword-relocations \
 			-fomit-frame-pointer -ffast-math \
 			$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS -DAPP_TITLE="\"$(APP_TITLE)\"" -Og
+CFLAGS	+=	$(INCLUDE) -DARM11 -D__3DS__ -DAPP_TITLE="\"$(APP_TITLE)\"" -Og
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
@@ -142,9 +147,10 @@ $(BUILD):
 
 #---------------------------------------------------------------------------------
 clean:
-	@echo clean ...
-	@rm -rf $(BUILD) $(APP_TITLE).* assets/banner.bin assets/image.bin
-
+	@echo "cleaning up this mess ..."
+	@sleep 1
+	@rm -rf $(BUILD) $(APP_TITLE).* assets/banner.bin assets/image.bin 
+	@echo "cleaned :3"
 
 #---------------------------------------------------------------------------------
 else
@@ -180,8 +186,20 @@ stripped.elf: $(OUTPUT).elf
 
 $(OUTPUT).cia: stripped.elf $(TOPDIR)/assets/banner.bin $(TOPDIR)/assets/image.bin
 	@makerom -f cia -o $(OUTPUT).cia -rsf $(TOPDIR)/assets/cia.rsf -target t -exefslogo -elf stripped.elf -icon $(TOPDIR)/assets/image.bin -banner $(TOPDIR)/assets/banner.bin -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(APP_PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(APP_UNIQUE_ID)" -DAPP_ROMFS=$(TOPDIR)/$(ROMFS)
-	@echo "built ... $(notdir $@)"
-	@7z a -mx9 $(TOPDIR)/$(APP_TITLE).7z $(TOPDIR)/$(APP_TITLE).* $(TOPDIR)/README.md
+	@echo "built ... $(notdir $@)"	
+ifeq ($(ZIP),true)
+ifeq ($(KAZIP),true)
+	@7z a -mx9 $(TOPDIR)/$(APP_TITLE)-complete.7z $(TOPDIR)/$(APP_TITLE).* $(TOPDIR)/README.md > nul
+	@echo "zipped"
+else
+	@7z a -mx9 $(TOPDIR)/$(APP_TITLE)-complete.7z $(TOPDIR)/$(APP_TITLE).* $(TOPDIR)/README.md > nul
+	@rm $(TOPDIR)/$(APP_TITLE).*
+	@echo "zipped"
+endif
+else
+	@echo
+	@echo "ZIP not set to true. files present in $(TOPDIR)"
+endif
 
 #---------------------------------------------------------------------------------
 # you need a rule like this for each extension you use as binary data
