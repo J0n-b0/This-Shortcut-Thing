@@ -1,5 +1,5 @@
 # This-Shortcut-Thing
-A fork of the abandoned [That-Shortcut-Thingy](https://github.com/SUOlivia/That-Shortcut-Thingy). 
+A fork of the abandoned [That-Shortcut-Thingy](https://github.com/SUOlivia/That-Shortcut-Thingy), adding new stuff to whatever.\n
 Boot Firms with a CIA shortcut
 
 Usage instructions:
