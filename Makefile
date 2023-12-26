@@ -34,14 +34,14 @@ SOURCES		    :=	source
 DATA		    :=	data
 INCLUDES	    :=	inc
 ROMFS			:=	romfs
-APP_TITLE       :=  open_agb_firm
+APP_TITLE       :=  GodMode9
 TARGET		    :=	$(APP_TITLE)
 APP_DESCRIPTION :=  Open source 3DS all access file browser
 APP_AUTHOR      :=  d0k3
-APP_PRODUCT_CODE:=  CTR-P-AAGB
+APP_PRODUCT_CODE:=  CTR-P-AGM9
 APP_UNIQUE_ID   :=  0xA9001
 ICON            :=  $(TOPDIR)/assets/icon.png
-ZIP             :=  true
+ZIP             :=  
 KAZIP           :=  
 
 APP_TITLE       :=  $(shell echo "$(APP_TITLE)" | cut -c1-128)
