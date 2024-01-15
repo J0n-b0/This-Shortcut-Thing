@@ -1,7 +1,9 @@
 # This-Shortcut-Thing
 A fork of the abandoned [That-Shortcut-Thingy](https://github.com/SUOlivia/That-Shortcut-Thingy), adding back functionality and new features.
 
-Boot Firms with a CIA shortcut            Requires [FastBoot3ds](https://github.com/derrekr/fastboot3DS) with FCRAM enabled (it's under boot setup) or [GodMode9](https://github.com/d0k3/GodMode9) as Firm0 instead of B9S 
+Boot Firms with a CIA shortcut 
+
+Requires [FastBoot3ds](https://github.com/derrekr/fastboot3DS) with FCRAM enabled (it's under boot setup) or [GodMode9](https://github.com/d0k3/GodMode9) as Firm0 instead of B9S 
   
 Building instructions:
   Needs [bannertool](https://github.com/Steveice10/bannertool) and [makerom](https://github.com/3DSGuy/Project_CTR/tree/master/makerom) set in environment
