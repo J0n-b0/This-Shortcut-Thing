@@ -1,5 +1,5 @@
 # This-Shortcut-Thing
-A fork of the abandoned [That-Shortcut-Thingy](https://github.com/SUOlivia/That-Shortcut-Thingy), adding back functionality and new features.
+A fork of the abandoned [That-Shortcut-Thingy](https://github.com/SUOlivia/That-Shortcut-Thingy), fixing stuff.
 
 Boot Firms with a CIA shortcut 
 
@@ -15,7 +15,3 @@ Building instructions:
   5. Have fun!
 
   When finished, remember to run `clean` to reset and get rid of old files before making another shortcut :3
-
-
-Note: 
-When building, two errors will be produced ending in `[-Wint-conversion]`. It works fine even with this error, and I'm hoping to fix it eventually.
