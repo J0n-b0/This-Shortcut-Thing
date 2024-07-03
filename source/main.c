@@ -34,7 +34,6 @@ void __attribute__((weak)) __appInit(void)
     acInit();
     hidInit();
     fsInit();
-    sdmcInit();
 	romfsInit();
 	
 }
@@ -42,7 +41,6 @@ void __attribute__((weak)) __appInit(void)
 void __attribute__((weak)) __appExit(void) 
 {
 	// Exit services
-    sdmcExit();
 	romfsExit();
     fsExit();
 	gfxExit();
@@ -89,8 +87,8 @@ int main()
     gfxInitDefault();
 	consoleInit(GFX_BOTTOM, NULL);
 	
-	u8 *contents, slot, annoy;
-	FILE *payload, *splash, *log;
+	u8 *contents, annoy;
+	FILE *payload, *splash;
 	size_t splash_size, payload_size;
 	
 	if (!buf)

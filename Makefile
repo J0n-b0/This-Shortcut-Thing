@@ -21,10 +21,11 @@ include $(DEVKITARM)/3ds_rules
 # APP_DESCRIPTION is the description of the app stored in the SMDH file (Optional)
 # APP_AUTHOR is the author of the app stored in the SMDH file (Optional)
 # ICON is the filename of the icon (.png), relative to the project folder.
-#   If not set, it attempts to use one of the following (in this order):
-#     - <Project name>.png
-#     - icon.png
-#     - <libctru folder>/default_icon.png
+#    If not set, it attempts to use one of the following (in this order):
+#      1- <Project name>.png
+#      2- icon.png
+#      3- <libctru folder>/default_icon.png
+# ZIP if set to true, will package the files into a .7z file (Optional).
 #---------------------------------------------------------------------------------
 BUILD		    :=	build
 SOURCES		    :=	source
@@ -38,6 +39,8 @@ APP_AUTHOR      :=  d0k3
 APP_PRODUCT_CODE:=  CTR-P-AGM9
 APP_UNIQUE_ID   :=  0xA9001
 ICON            :=  $(TOPDIR)/assets/icon.png
+ZIP             :=  
+KAZIP           :=  
 
 APP_TITLE       :=  $(shell echo "$(APP_TITLE)" | cut -c1-128)
 APP_DESCRIPTION :=  $(shell echo "$(APP_DESCRIPTION)" | cut -c1-256)
@@ -54,7 +57,7 @@ CFLAGS	:=	-g -Wall -O2 -mword-relocations \
 			-fomit-frame-pointer -ffast-math \
 			$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS -DAPP_TITLE="\"$(APP_TITLE)\"" -Og
+CFLAGS	+=	$(INCLUDE) -DARM11 -D__3DS__ -DAPP_TITLE="\"$(APP_TITLE)\"" -Og
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
@@ -142,9 +145,8 @@ $(BUILD):
 
 #---------------------------------------------------------------------------------
 clean:
-	@echo clean ...
+	@echo "clean ..."
 	@rm -rf $(BUILD) $(APP_TITLE).* assets/banner.bin assets/image.bin
-
 
 #---------------------------------------------------------------------------------
 else
@@ -180,8 +182,17 @@ stripped.elf: $(OUTPUT).elf
 
 $(OUTPUT).cia: stripped.elf $(TOPDIR)/assets/banner.bin $(TOPDIR)/assets/image.bin
 	@makerom -f cia -o $(OUTPUT).cia -rsf $(TOPDIR)/assets/cia.rsf -target t -exefslogo -elf stripped.elf -icon $(TOPDIR)/assets/image.bin -banner $(TOPDIR)/assets/banner.bin -DAPP_TITLE="$(APP_TITLE)" -DAPP_PRODUCT_CODE="$(APP_PRODUCT_CODE)" -DAPP_UNIQUE_ID="$(APP_UNIQUE_ID)" -DAPP_ROMFS=$(TOPDIR)/$(ROMFS)
-	@echo "built ... $(notdir $@)"
-	@7z a -mx9 $(TOPDIR)/$(APP_TITLE).7z $(TOPDIR)/$(APP_TITLE).* $(TOPDIR)/README.md
+	@echo "built ... $(notdir $@)"	
+
+ifeq ($(ZIP),true)
+	@7z a -mx9 $(TOPDIR)/$(APP_TITLE)-complete.7z $(TOPDIR)/$(APP_TITLE).* $(TOPDIR)/README.md > nul
+ifneq ($(KAZIP),true)
+	@rm $(TOPDIR)/$(APP_TITLE).*
+endif
+	@echo "zipped"
+else
+	@echo "ZIP not set to true. files present in $(TOPDIR)"
+endif
 
 #---------------------------------------------------------------------------------
 # you need a rule like this for each extension you use as binary data
