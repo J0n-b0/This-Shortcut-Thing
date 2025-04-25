@@ -39,8 +39,7 @@ APP_AUTHOR      :=  d0k3
 APP_PRODUCT_CODE:=  CTR-P-AGM9
 APP_UNIQUE_ID   :=  0xA9001
 ICON            :=  $(TOPDIR)/assets/icon.png
-ZIP             :=  
-KAZIP           :=  
+ZIP             :=  true
 
 APP_TITLE       :=  $(shell echo "$(APP_TITLE)" | cut -c1-128)
 APP_DESCRIPTION :=  $(shell echo "$(APP_DESCRIPTION)" | cut -c1-256)
@@ -185,14 +184,10 @@ $(OUTPUT).cia: stripped.elf $(TOPDIR)/assets/banner.bin $(TOPDIR)/assets/image.b
 	@echo "built ... $(notdir $@)"	
 
 ifeq ($(ZIP),true)
-	@7z a -mx9 $(TOPDIR)/$(APP_TITLE)-complete.7z $(TOPDIR)/$(APP_TITLE).* $(TOPDIR)/README.md > nul
-ifneq ($(KAZIP),true)
-	@rm $(TOPDIR)/$(APP_TITLE).*
-endif
+	@7z a -mx9 $(TOPDIR)/$(APP_TITLE)-complete.zip $(TOPDIR)/$(APP_TITLE).* $(TOPDIR)/README.md > nul
 	@echo "zipped"
-else
-	@echo "ZIP not set to true. files present in $(TOPDIR)"
 endif
+
 
 #---------------------------------------------------------------------------------
 # you need a rule like this for each extension you use as binary data

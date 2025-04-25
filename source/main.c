@@ -4,9 +4,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <3ds.h>
-
-#include "LED.h"
-#include "MCU.h"
 	
 #define PATH_SPLASH "romfs:/splash.bin"
 #define PATH_PAYLOADRFS "romfs:/payload.firm"
@@ -30,7 +27,8 @@ void __attribute__((weak)) __appInit(void)
     
 	// Initialize services
     srvInit();
-    aptInit();
+	mcuHwcInit();
+	aptInit();
     acInit();
     hidInit();
     fsInit();
@@ -48,46 +46,27 @@ void __attribute__((weak)) __appExit(void)
 	acExit();
     aptExit();
     srvExit();
+	mcuHwcExit();
 
     GSPGPU_FlushDataCache(buf, FIRM_MAXSIZE);
     linearFree(buf);
 }
 
-/*void wait_for_a()
+void setLED(InfoLedPattern* pat, u8 r, u8 g, u8 b)
 {
-	while(1)
-		if(hidKeysDown() & KEY_A)
-			break;
-}*/
+	memset(pat->redPattern, r, 32);
+    memset(pat->greenPattern, g, 32);
+    memset(pat->bluePattern, b, 32);
+	MCUHWC_SetInfoLedPattern(pat);
+}
 
-/*int RamBootFB3ds()
-{
-	size_t size;
-	char config[25], *strout;
-	FILE *cfg = fopen(PATH_FB3DSCFGSD, "r"), *log = fopen(PATH_LOG,"wb");
-
-	if(cfg)
-	{
-		while(fgets(config, sizeof(config), cfg))
-		{
-			if(config == FB3DS_FIRMBOOTSTR)
-			{
-				return 1;
-			}
-			fprintf(log, "fgets read '%s'\n", config);
-		}
-		return 2;
-	}
-	fclose(log);
-	return 0;
-}*/
 int main() 
 {
 	
     gfxInitDefault();
 	consoleInit(GFX_BOTTOM, NULL);
 	
-	u8 *contents, annoy;
+	u8 *contents;
 	FILE *payload, *splash;
 	size_t splash_size, payload_size;
 	
@@ -95,8 +74,7 @@ int main()
 	{
 		printf("Error: out of memory\n");
     }
-	mcuWriteRegister(CONF_REG,(u8*) 0, 1);
-	mcuReadRegister(CONF_REG, &annoy, 1);
+
     printf("firm@%08lX\n", (u32) buf + FIRM_OFFSET);
     if ((u32) buf != 0x14000000) 
 	{
@@ -116,17 +94,6 @@ int main()
 	gfxSwapBuffers();
 	gspWaitForVBlank();
 	
-	/*if(!fopen(PATH_DEFAULT, "r"))
-	{
-		printf("%s not found on the root of the SD\n", PATH_DEFAULT);
-		gfxFlushBuffers();
-		gfxSwapBuffers();
-		fixcolor(255,0,0);
-		for(int i=0; i<=300; i++) gspWaitForVBlank();
-		errfInit();
-		ERRF_ThrowResultWithMessage((Result) 'TST', "Read the README next time");
-		errfExit();
-	}*/
 	payload = fopen(PATH_PAYLOADSD, "r");
 	
 	if(!payload)
@@ -138,45 +105,21 @@ int main()
 		printf("Custom payload found on SD\n");
 	}
 	
-	//log = fopen(PATH_LOG,"w");
-	//fprintf(log, "RamBootFB3ds() returned %d", ret);
-	//fclose(log);
-	/*if(!ret && !annoy)
-	{
-		fixcolor(255, 0, 0);
-		printf("FastBoot 3DS config not found, %s might not launch.\nPress (A) to get rid of this message\nPress (B) to ignore\n", APP_TITLE);
-		while(1)
-		{
-			if(hidKeysDown() & KEY_A)
-			{
-				mcuWriteRegister(CONF_REG,(u8*) 1, 1);
-				break;
-			}
-			if(hidKeysDown() & KEY_B)
-			{
-				break;
-			}
-		}
-	}
-	else if(ret == 2)
-	{
-		fixcolor(255, 165, 0);
-		printf("FastBoot 3DS not properly configured.\nPlease enable 'FCRAM Boot' under the 'Boot Setup' menu\n");
-		for(int i=0; i<=60*5; i++) gspWaitForVBlank();
-	}*/
-	
 	fseek(payload, 0, SEEK_END);
 	payload_size = ftell(payload);
 	rewind(payload);
+
+	InfoLedPattern pattern;
+	pattern.smoothing = 0xFF;
 	if(fread(buf + 0x1000, 1, payload_size, payload) != payload_size)
-		fixcolor(255, 0, 0);
+		setLED(&pattern, 255, 0, 0);
 	else
-		fixcolor(0, 255, 0);
-	
+		setLED(&pattern, 0, 255, 0);
+
 	fclose(payload);
 	
 	for(int i=0; i<=60; i++) gspWaitForVBlank();
-	stfuled();
+	setLED(&pattern, 0, 0, 0);
 	APT_HardwareResetAsync();
 	
     

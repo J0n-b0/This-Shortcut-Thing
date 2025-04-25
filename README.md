@@ -1,5 +1,4 @@
 # This-Shortcut-Thing
-A fork of the abandoned [That-Shortcut-Thingy](https://github.com/SUOlivia/That-Shortcut-Thingy), fixing stuff.
 
 Boot Firms with a CIA shortcut
 
@@ -13,5 +12,3 @@ Building instructions:
   3. Drop the payload and the splash screen (use the same method as you would for Luma3ds splashes) in the romfs folder
   4. Run `make`
   5. Have fun!
-
-  When finished, remember to run `clean` to reset and get rid of old files before making another shortcut :3
